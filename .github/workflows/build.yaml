@@ -68,6 +68,7 @@ jobs:
         #find /opt/inclination
     - name: Build
       run: |
+        cd cyclonedds-python
         CYCLONEDDS_HOME=/opt/inclination python3 -m build --sdist --wheel
 
     - name: Upload
