@@ -61,6 +61,7 @@ jobs:
     - name: Set up dependencies
       run: |
         sudo apt update
+        sudo apt install -y python3-build python3-wheel
         #find artifacts
         #dpkg -c artifacts/eclipse-cyclone-dds_0.11.0_amd64.deb
         sudo apt install -y ./artifacts/*.deb
@@ -68,4 +69,10 @@ jobs:
     - name: Build
       run: |
         CYCLONEDDS_HOME=/opt/inclination python3 -m build --sdist --wheel
+
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: eclipse-cyclone-dds-python-${{ matrix.arch }}
+        path: cyclonedds-python/dist/*
 
