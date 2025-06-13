@@ -40,3 +40,19 @@ jobs:
         name: eclipse-cyclone-dds-${{ matrix.arch }}
         path: cyclonedds/build/*.deb
 
+  deploy:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download
+      uses: actions/download_artifact@v4
+      with:
+        name: eclipse-cyclone-dds-${{ matrix.arch }}
+        path: artifact
+    - name: Display
+      run: ls -R artifact
+
