@@ -57,6 +57,7 @@ jobs:
       run: |
         sudo apt update
         find artifacts
+        dpkg -c eclipse-cyclone-dds_0.11.0_amd64.deb
         sudo apt install -y ./artifacts/*.deb
-        find /opt/inclination
+        #find /opt/inclination
 
