@@ -30,7 +30,7 @@ jobs:
         cd cyclonedds
         mkdir build
         cd build
-        cmake -DMAKE_INSTALL_PREFIX=/opt/inclination ..
+        cmake -DCMAKE_INSTALL_PREFIX=/opt/inclination ..
         cmake --build .
         cpack -G DEB
 
