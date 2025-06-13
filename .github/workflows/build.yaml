@@ -1,0 +1,41 @@
+name: Build CycloneDDS
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+          - os: ubuntu-latest
+            platform: linux
+            arch: amd64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Clone
+      run: |
+        git clone --depth 1 https://github.com/eclipse-cyclonedds/cyclonedds.git
+        cd cyclonedds
+
+    - name: Set up dependancies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential cmake
+
+    - name: Build
+      run: |
+        cd cyclonedds
+        mkdir build
+        cd build
+        cmake ..
+        make -j$(nproc)
+
