@@ -37,5 +37,12 @@ jobs:
         mkdir build
         cd build
         cmake ..
-        make -j$(nproc)
+        cmake --build .
+        cpack -G DEB
+
+        #      #- name: Upload
+        #uses: actions/upload-artifact@v4
+        #with:
+        #name:
+        #path: cyclonedds/build/
 
