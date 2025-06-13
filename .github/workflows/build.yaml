@@ -40,9 +40,9 @@ jobs:
         cmake --build .
         cpack -G DEB
 
-        #      #- name: Upload
-        #uses: actions/upload-artifact@v4
-        #with:
-        #name:
-        #path: cyclonedds/build/
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: Packages
+        path: cyclonedds/build/*.deb
 
