@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cyclone-dds:
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +40,7 @@ jobs:
         name: eclipse-cyclone-dds-${{ matrix.arch }}
         path: cyclonedds/build/*.deb
 
-  deploy:
+  cyclonedds-python:
     strategy:
       fail-fast: false
       matrix:
