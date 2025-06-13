@@ -52,7 +52,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: eclipse-cyclone-dds-${{ matrix.arch }}
-        path: artifact
+        path: artifacts
     - name: Display
       run: |
         sudo apt update
