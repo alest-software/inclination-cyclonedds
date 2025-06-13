@@ -49,16 +49,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: cyclonedds
     steps:
-    - name: Download
+    - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
         name: eclipse-cyclone-dds-${{ matrix.arch }}
         path: artifacts
-    - name: Display
+    - name: Clone
+      run: |
+        git clone --depth 1 https://github.com/eclipse-cyclonedds/cyclonedds-python.git
+        cd cyclonedds-python
+    - name: Set up dependencies
       run: |
         sudo apt update
-        find artifacts
-        dpkg -c artifacts/eclipse-cyclone-dds_0.11.0_amd64.deb
+        #find artifacts
+        #dpkg -c artifacts/eclipse-cyclone-dds_0.11.0_amd64.deb
         sudo apt install -y ./artifacts/*.deb
         #find /opt/inclination
+    - name: Build
+      run: |
+        CYCLONEDDS_HOME=/opt/inclination python3 -m build --sdist --wheel
 
