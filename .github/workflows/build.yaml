@@ -2,7 +2,7 @@ name: Build CycloneDDS
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 3 1 * *'
   workflow_dispatch:
 
 env:
@@ -67,15 +67,17 @@ jobs:
       run: |
         git clone --depth 1 https://github.com/eclipse-cyclonedds/cyclonedds-python.git
         cd cyclonedds-python
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: Set up dependencies
       run: |
         sudo apt update
         sudo apt install -y gh
         sudo apt install -y ./artifacts/*.deb
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+        sudo python -m pip install --upgrade pip
+        sudo python -m pip install build
     - name: Build
       run: |
         cd cyclonedds-python
