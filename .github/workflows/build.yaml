@@ -76,8 +76,8 @@ jobs:
         sudo apt update
         sudo apt install -y gh
         sudo apt install -y ./artifacts/*.deb
-        sudo python -m pip install --upgrade pip
-        sudo python -m pip install build
+        python -m pip install --upgrade pip
+        pip install build
     - name: Build
       run: |
         cd cyclonedds-python
