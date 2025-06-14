@@ -95,7 +95,7 @@ jobs:
         for fn in *.whl; do \
           gh api \
             -X PUT \
-            /repos/alest-software/simple/contents/${fn} \
+            /repos/alest-software/simple/contents/cyclonedds/${fn} \
             -f message='GitHub Action' \
             -f content="$(base64 -w 0 ${fn})"; \
         done
