@@ -93,10 +93,10 @@ jobs:
         cd cyclonedds-python/dist
         ls -al
         for fn in *.whl; do \
-          echo gh api \
+          gh api \
             -X PUT \
             /repos/alest-software/simple/contents/${fn} \
             -f message='GitHub Action' \
-            -f content=""; \
+            -f content="$(base64 -w 0 ${fn})"; \
         done
 
