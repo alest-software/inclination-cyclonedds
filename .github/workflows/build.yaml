@@ -12,13 +12,14 @@ env:
   #GITHUB_UPLOAD_NAME: ${{ secrets.UPLOAD_NAME }}
   #GITHUB_UPLOAD_EMAIL: ${{ secrets.UPLOAD_EMAIL }}
   GITHUB_TOKEN: ${{ secrets.TOKEN }}
+  CYCLONEDDS_HOME: /opt/inclination
 
 jobs:
   cyclonedds:
     strategy:
       fail-fast: false
       matrix:
-        arch: [amd64]
+        arch: [x64, arm64]
 
     runs-on: ubuntu-latest
 
@@ -41,7 +42,7 @@ jobs:
         cmake -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/inclination ..
         cmake --build .
         cpack -G DEB
-        find . -name '*.deb' -exec dpkg -c {} \;
+        #find . -name '*.deb' -exec dpkg -c {} \;
 
     - name: Upload
       uses: actions/upload-artifact@v4
@@ -53,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [amd64]
+        arch: [x64, arm64]
         python-version: ["3.10"]
     runs-on: ubuntu-latest
     needs: cyclonedds
@@ -81,7 +82,7 @@ jobs:
     - name: Build
       run: |
         cd cyclonedds-python
-        CYCLONEDDS_HOME=/opt/inclination python3 -m build -C--global-option=egg_info -C--global-option=--tag-build="`date '+%Y%m%d'`-${{github.run_number}}" --sdist --wheel
+        python -m build -C--global-option=egg_info -C--global-option=--tag-build="`date '+%Y%m%d'`-${{github.run_number}}" --sdist --wheel
     - name: Upload
       uses: actions/upload-artifact@v4
       with:
@@ -94,7 +95,6 @@ jobs:
         for fn in *.whl; do \
           base64 -w 0 ${fn} > content.b64; \
           jq -n --arg message "GitHub Action" --rawfile content content.b64 '{message: $message, content: $content}' > upload.json; \
-          ls -al; \
           gh api -X PUT "/repos/alest-software/simple/contents/cyclonedds/${fn}" --input upload.json; \
         done
 
