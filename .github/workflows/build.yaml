@@ -91,10 +91,11 @@ jobs:
       run: |
         gh auth status
         cd cyclonedds-python/dist
-        for fn in '*.whl'; do \
+        ls -al
+        for fn in *.whl; do \
           echo gh api \
             -X PUT \
-            /repos/alest-software/simple/contents/$fn \
+            /repos/alest-software/simple/contents/${fn} \
             -f message='GitHub Action' \
             -f content=""; \
         done
