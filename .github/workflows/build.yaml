@@ -5,6 +5,14 @@ on:
     - cron: '0 3 * * *'
   workflow_dispatch:
 
+env:
+  #GITHUB_UPLOAD_REPO: ${{ vars.UPLOAD_REPO }}
+  #GITHUB_UPLOAD_OWNER: ${{ vars.UPLOAD_OWNER }}
+  #GITHUB_UPLOAD_PATH: ${{ vars.UPLOAD_PATH }}
+  #GITHUB_UPLOAD_NAME: ${{ secrets.UPLOAD_NAME }}
+  #GITHUB_UPLOAD_EMAIL: ${{ secrets.UPLOAD_EMAIL }}
+  GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
 jobs:
   cyclonedds:
     strategy:
@@ -61,7 +69,7 @@ jobs:
     - name: Set up dependencies
       run: |
         sudo apt update
-        sudo apt install -y python3-build python3-wheel
+        sudo apt install -y python3-build python3-wheel gh
         #find artifacts
         #dpkg -c artifacts/eclipse-cyclone-dds_0.11.0_amd64.deb
         sudo apt install -y ./artifacts/*.deb
@@ -76,4 +84,11 @@ jobs:
       with:
         name: eclipse-cyclone-dds-python-${{ matrix.arch }}
         path: cyclonedds-python/dist/*
+    - name: Deployment
+      run: |
+        gh auth status
+          #- name: Deployment
+      #uses: fjogeleit/http-request-action@v1
+        #  with:
+        #    url: 'https://api.github.com/repos/alest-software/simple/contents/cyclonedds'
 
