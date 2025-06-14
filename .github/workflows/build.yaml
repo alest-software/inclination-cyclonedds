@@ -90,7 +90,12 @@ jobs:
     - name: Deployment
       run: |
         gh auth status
-        find cyclonedds-python/dist -name '*' -exec \
-          echo gh api -X PUT /repos/alest-software/simple/contents/{} \
-            -f message='GitHub Action' -f content="" \;
+        cd cyclonedds-python/dist
+        for fn in '*.whl'; do \
+          echo gh api \
+            -X PUT \
+            /repos/alest-software/simple/contents/$fn \
+            -f message='GitHub Action' \
+            -f content=""; \
+        done
 
