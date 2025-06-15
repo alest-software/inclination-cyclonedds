@@ -5,7 +5,6 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.TOKEN }}
-  CPACK_PACKAGING_INSTALL_PREFIX: /opt/cyclonedds
   CYCLONEDDS_HOME: /opt/cyclonedds
 
 jobs:
@@ -33,7 +32,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ..
+        cmake -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/cyclonedds ..
         cmake --build .
         cpack -G DEB
 
