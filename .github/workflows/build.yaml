@@ -51,9 +51,10 @@ jobs:
         for fn in cyclonedds/build/*.deb; do
           arch=$(dpkg --info ${fn} | awk '/Architecture:/ {print $2}')
           fname=$(basename ${fn})
-          dest="dists/$codename/main/binary-$arch/$fname"
-          cp "${fn}" "apt/${dest}"
-          git add "apt/${dest}"
+          dest="dists/$codename/main/binary-$arch"
+          mkdir -p "apt/${dest}"
+          cp "${fn}" "apt/${dest}/${fname}"
+          git add "apt/${dest}/${fname}"
         done
         git status apt
         
