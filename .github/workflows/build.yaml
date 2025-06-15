@@ -1,4 +1,4 @@
-name: Build CycloneDDS
+s-tokename: Build CycloneDDS
 
 on:
 #  schedule:
@@ -47,7 +47,7 @@ jobs:
     - name: Deploy
       run: |
         codename=$(lsb_release -c -s)
-        git clone --depth 1 https://github.com/alest-software/apt.git
+        git clone --depth 1 https://x-access-token:${{ secrets.TOKEN }}github.com/alest-software/apt.git
         for fn in cyclonedds/build/*.deb; do
           arch=$(dpkg --info ${fn} | awk '/Architecture:/ {print $2}')
           fname=$(basename ${fn})
@@ -57,6 +57,8 @@ jobs:
           (cd apt; git add "${dest}/${fname}")
         done
         cd apt
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
         git commit -m 'Automatic deployment'
         git push
         
