@@ -54,9 +54,9 @@ jobs:
           dest="dists/$codename/main/binary-$arch"
           mkdir -p "apt/${dest}"
           cp "${fn}" "apt/${dest}/${fname}"
-          git add "apt/${dest}/${fname}"
+          (cd apt; git add "${dest}/${fname}")
         done
-        git status apt
+        (cd apt; git status)
         
 
 #    - name: Upload
