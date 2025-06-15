@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-24.04, ubuntu-22.04-arm]
+        platform: [ubuntu-24.04] #, ubuntu-22.04-arm]
 
     runs-on: ${{ matrix.platform }}
 
@@ -47,7 +47,7 @@ jobs:
     - name: Deploy
       run: |
         codename=$(lsb_release -c -s)
-        git clone --depth 1 https://x-access-token:${{ secrets.TOKEN }}github.com/alest-software/apt.git
+        git clone --depth 1 https://x-access-token:${{ secrets.TOKEN }}@github.com/alest-software/apt.git
         for fn in cyclonedds/build/*.deb; do
           arch=$(dpkg --info ${fn} | awk '/Architecture:/ {print $2}')
           fname=$(basename ${fn})
