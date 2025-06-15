@@ -6,11 +6,6 @@ on:
   workflow_dispatch:
 
 env:
-  #GITHUB_UPLOAD_REPO: ${{ vars.UPLOAD_REPO }}
-  #GITHUB_UPLOAD_OWNER: ${{ vars.UPLOAD_OWNER }}
-  #GITHUB_UPLOAD_PATH: ${{ vars.UPLOAD_PATH }}
-  #GITHUB_UPLOAD_NAME: ${{ secrets.UPLOAD_NAME }}
-  #GITHUB_UPLOAD_EMAIL: ${{ secrets.UPLOAD_EMAIL }}
   GITHUB_TOKEN: ${{ secrets.TOKEN }}
   CYCLONEDDS_HOME: /opt/inclination
 
@@ -19,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-24.04] #, ubuntu-22.04-arm]
+        platform: [ubuntu-24.04, ubuntu-22.04-arm]
 
     runs-on: ${{ matrix.platform }}
 
@@ -42,7 +37,6 @@ jobs:
         cmake -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/inclination ..
         cmake --build .
         cpack -G DEB
-        #find . -name '*.deb' -exec dpkg -c {} \;
 
     - name: Deploy
       run: |
@@ -57,9 +51,9 @@ jobs:
           (cd apt; git add "${dest}/${fname}")
         done
         cd apt
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git commit -m 'Automatic deployment'
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git commit -m 'Automatic deployment' || echo 'Nothing to commit'
         git push
         
 
