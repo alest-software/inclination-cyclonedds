@@ -56,7 +56,9 @@ jobs:
           cp "${fn}" "apt/${dest}/${fname}"
           (cd apt; git add "${dest}/${fname}")
         done
-        (cd apt; git status)
+        cd apt
+        git commit -m 'Automatic deployment'
+        git push
         
 
 #    - name: Upload
