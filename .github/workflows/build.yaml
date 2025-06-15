@@ -1,4 +1,4 @@
-s-tokename: Build CycloneDDS
+name: Build CycloneDDS
 
 on:
 #  schedule:
