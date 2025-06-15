@@ -48,11 +48,14 @@ jobs:
       run: |
         codename=$(lsb_release -c -s)
         git clone --depth 1 https://github.com/alest-software/apt.git
-        for fn in cyclonedds/build/*.deb; do \
-          arch=$(dpkg --info ${fn} | awk '/Architecture:/ {print $2}'); \
+        for fn in cyclonedds/build/*.deb; do
+          arch=$(dpkg --info ${fn} | awk '/Architecture:/ {print $2}')
           fname=$(basename ${fn})
-          echo "dists/$codename/main/binary-$arch/$fname"; \
+          dest="dists/$codename/main/binary-$arch/$fname"
+          cp "${fn}" "apt/${dest}"
+          git add "apt/${dest}"
         done
+        git status apt
         
 
 #    - name: Upload
