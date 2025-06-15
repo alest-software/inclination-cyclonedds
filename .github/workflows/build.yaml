@@ -1,44 +1,43 @@
 name: Build CycloneDDS
 
 on:
-#  schedule:
-#    - cron: '0 3 1 * *'
   workflow_dispatch:
 
 env:
   GITHUB_TOKEN: ${{ secrets.TOKEN }}
-  CYCLONEDDS_HOME: /opt/inclination
+  CPACK_PACKAGING_INSTALL_PREFIX: /opt/cyclonedds
+  CYCLONEDDS_HOME: /opt/cyclonedds
 
 jobs:
   cyclonedds:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-24.04, ubuntu-22.04-arm]
+        platform: [ubuntu-24.04, ubuntu-22.04-arm, ubuntu-24.04-arm]
 
     runs-on: ${{ matrix.platform }}
 
     steps:
-    - name: Clone
+    - name: Clone external project
       run: |
         git clone --depth 1 https://github.com/eclipse-cyclonedds/cyclonedds.git
         cd cyclonedds
 
-    - name: Set up dependancies
+    - name: Set-up dependancies
       run: |
         sudo apt update
         sudo apt install -y build-essential cmake
 
-    - name: Build
+    - name: Build from source
       working-directory: ./cyclonedds
       run: |
         mkdir build
         cd build
-        cmake -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/inclination ..
+        cmake ..
         cmake --build .
         cpack -G DEB
 
-    - name: Deploy
+    - name: Deploy to repository
       run: |
         codename=$(lsb_release -c -s)
         git clone --depth 1 https://x-access-token:${{ secrets.TOKEN }}@github.com/alest-software/ubuntu.git
@@ -57,57 +56,69 @@ jobs:
         git push
         
 
-#    - name: Upload
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: eclipse-cyclone-dds-${{ matrix.arch }}
-#        path: cyclonedds/build/*.deb
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: eclipse-cyclone-dds-${{ matrix.platform }}
+        path: cyclonedds/build/*.deb
 
-#  cyclonedds-python:
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        arch: [x64, arm64]
-#        python-version: ["3.10"]
-#    runs-on: ${{ matrix.arch == 'x64' && 'ubuntu-latest' || 'ubuntu-22.04-arm' }}
-#    needs: cyclonedds
-#    steps:
-#    - name: Download artifacts
-#       uses: actions/download-artifact@v4
-#       with:
-#         name: eclipse-cyclone-dds-${{ matrix.arch }}
-#         path: artifacts
-#    - name: Clone
-#      run: |
-#        git clone --depth 1 https://github.com/eclipse-cyclonedds/cyclonedds-python.git
-#        cd cyclonedds-python
-#    - name: Set up Python ${{ matrix.python-version }}
-#      uses: actions/setup-python@v5
-#      with:
-#        python-version: ${{ matrix.python-version }}
-#    - name: Set up dependencies
-#      run: |
-#        sudo apt update
-#        sudo apt install -y gh
-#        sudo apt install -y ./artifacts/*.deb
-#        python -m pip install --upgrade pip
-#        pip install build
-#    - name: Build
-#      run: |
-#        cd cyclonedds-python
-#        python -m build -C--global-option=egg_info -C--global-option=--tag-build="`date '+%Y%m%d'`-${{github.run_number}}" --sdist --wheel
-#    - name: Upload
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: eclipse-cyclone-dds-python-${{ matrix.arch }}
-#        path: cyclonedds-python/dist/*
-#    - name: Deployment
-#      run: |
-#        gh auth status
-#        cd cyclonedds-python/dist
-#        for fn in *.whl; do \
-#          base64 -w 0 ${fn} > content.b64; \
-#          jq -n --arg message "GitHub Action" --rawfile content content.b64 '{message: $message, content: $content}' > upload.json; \
-#          gh api -X PUT "/repos/alest-software/simple/contents/cyclonedds/${fn}" --input upload.json; \
-#        done
+  cyclonedds-python:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-24.04, ubuntu-22.04-arm]
+        python-version: ["3.10"]
+        
+    runs-on: ${{ matrix.platform }}
+    
+    needs: cyclonedds
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: eclipse-cyclone-dds-${{ matrix.platform }}
+        path: artifacts
+        
+    - name: Clone
+      run: |
+        git clone --depth 1 https://github.com/eclipse-cyclonedds/cyclonedds-python.git
+        cd cyclonedds-python
+        
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Set up dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y gh
+        sudo apt install -y ./artifacts/*.deb
+        python -m pip install --upgrade pip
+        pip install build
+        
+    - name: Build
+      run: |
+        cd cyclonedds-python
+        python -m build \
+          -C--global-option=egg_info \
+          -C--global-option=--tag-build="`date '+%Y%m%d'`-${{github.run_number}}" \
+          --sdist --wheel
+        
+    - name: Upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: eclipse-cyclone-dds-python-${{ matrix.platform }}
+        path: cyclonedds-python/dist/*
+        
+    - name: Deployment
+      run: |
+        gh auth status
+        cd cyclonedds-python/dist
+        for fn in *.whl; do
+          base64 -w 0 ${fn} > content.b64
+          jq -n --arg message "GitHub Action" --rawfile content content.b64 '{message: $message, content: $content}' > upload.json
+          gh api -X PUT "/repos/alest-software/simple/contents/cyclonedds/${fn}" --input upload.json
+        done
 
